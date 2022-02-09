@@ -1,17 +1,28 @@
-import { StyleSheet, Text, SafeAreaView, Button, Alert, Touchable, View, Image } from "react-native";
-import { useState, useEffect } from "react";
-import { ResponseType, useAuthRequest } from "expo-auth-session";
-import { myTopTracks, albumTracks } from "./utils/apiOptions";
-import { REDIRECT_URI, SCOPES, CLIENT_ID, ALBUM_ID } from "./utils/constants";
+import { StyleSheet, Text, SafeAreaView, Button, Alert, Touchable, View, Image, Pressable } from "react-native";
 import Colors from "./Themes/colors";
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from "@react-navigation/native";
 
-export default function Song({ title, artist, index, albumUri, album, duration }) {
+
+export default function Song({ title, artist, albumUri, album, duration,
+    external_url, preview_url }) {
+
+    const navigation = useNavigation();
+
     return (
         <SafeAreaView style={styles.song}>
-            <Text style={styles.index}>{index}</Text>
-            <Image source={{uri: albumUri}} style={styles.albStyle} />
+            <Pressable style={styles.view} onPress={() => navigation.navigate('SongPreview', {
+                url: preview_url
+            })}>
+                <Ionicons name="play-circle" size={20} style={styles.icon} />
+            </Pressable>
+            <Image source={{ uri: albumUri }} style={styles.albStyle} />
             <View style={styles.child}>
-                <Text style={styles.title} numberOfLines={1}>{title}</Text>
+                <Pressable onPress={() => navigation.navigate('SongDetails', {
+                    url: external_url
+                })}>
+                    <Text style={styles.title} numberOfLines={1}>{title}</Text>
+                </Pressable>
                 <Text style={styles.artist} numberOfLines={1}>{artist}</Text>
             </View>
             <Text style={styles.album} numberOfLines={1}>{album}</Text>
@@ -28,12 +39,13 @@ const styles = StyleSheet.create({
         justifyContent: 'space-evenly',
         marginVertical: 8,
     },
-    index: {
+    view: {
         flex: 1,
-        fontSize: 16,
-        textAlign: 'center',
-        color: Colors.gray,
-        marginHorizontal: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    icon: {
+        color: Colors.spotify,
     },
     albStyle: {
         flex: 2,

@@ -5,6 +5,10 @@ import { myTopTracks, albumTracks } from "./utils/apiOptions";
 import { REDIRECT_URI, SCOPES, CLIENT_ID, ALBUM_ID } from "./utils/constants";
 import Colors from "./Themes/colors";
 import TopTracks from "./flatlist";
+import { NavigationContainer, StackActions } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import SongDetails from "./SongDetails";
+import SongPreview from "./SongPreview";
 
 // Endpoints for authorizing with Spotify
 const discovery = {
@@ -12,7 +16,9 @@ const discovery = {
   tokenEndpoint: "https://accounts.spotify.com/api/token"
 };
 
-export default function App() {
+const Stack = createStackNavigator();
+
+function HomeScreen({ navigation }) {
   const [token, setToken] = useState("");
   const [tracks, setTracks] = useState([]);
   const [request, response, promptAsync] = useAuthRequest(
@@ -48,7 +54,7 @@ export default function App() {
     return (
       <Pressable onPress={() => {
         promptAsync();
-        }}>
+      }}>
         <View style={styles.button}>
           <Image source={require('./assets/spotify-logo.png')} style={styles.logo} />
           <Text style={styles.buttonText}>Connect to Spotify</Text>
@@ -60,15 +66,39 @@ export default function App() {
   let contentDisplayed = null;
 
   if (token) {
-    contentDisplayed = <TopTracks data={tracks}/>
+    contentDisplayed = <TopTracks data={tracks} />
   } else {
-    contentDisplayed = <SpotifyAuthButton/>
+    contentDisplayed = <SpotifyAuthButton />
   }
 
   return (
     <SafeAreaView style={styles.container}>
       {contentDisplayed}
     </SafeAreaView>
+  );
+}
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="HomeScreen" component={HomeScreen} 
+          options={{
+            headerShown: false,
+          }}>
+        </Stack.Screen>
+        <Stack.Screen name="SongDetails" component={SongDetails} 
+          options={{
+            headerBackTitle: 'Back',
+            title: 'Song Details'
+        }}/>
+        <Stack.Screen name="SongPreview" component={SongPreview} 
+          options={{
+            headerBackTitle: 'Back',
+            title: 'Song Preview'
+        }}/>
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
